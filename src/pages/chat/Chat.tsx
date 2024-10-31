@@ -3,12 +3,12 @@
 // 비로그인 시 채팅 기록 유지
 // chat DB에 user(회원/비회원) 데이터 추가
 // 삭제
-// 이미지 검색
 // markdown 수정
 // 싫어요
 // 좋아요
 // 브랜드 좋아요 -> plp?
 // PLP
+// 가로 스크롤
 // brand image..
 
 import { useEffect, useRef, useState } from 'react';
@@ -95,7 +95,7 @@ function Chat() {
   };
 
   // message 전송
-  const { sendMessage } = useSendMessage({ uid, id, messageIdRef, setMessages });
+  const { sendMessage, sendNewChatMessage } = useSendMessage({ uid, id, messageIdRef, setMessages });
 
   // Open Bottom Sheet
   useEffect(() => {
@@ -116,8 +116,8 @@ function Chat() {
       {mode === 'start' && <ChatQuestions sendMessage={sendMessage} />}
       {mode === 'keyword' && (
         <ChatKeyword
-          uid={uid}
           keywordMessage={keywordMessage}
+          sendNewChatMessage={sendNewChatMessage}
         />
       )}
       {showInput && <ChatInput sendMessage={sendMessage} />}

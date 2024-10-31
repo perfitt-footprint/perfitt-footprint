@@ -1,13 +1,13 @@
 // 마이 페이지
 
-// 프로필 사진 변경
 // 고객센터 link 변경
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../service/firebase';
 import { useUserStore } from '../../stores/user.store';
 import HeaderLayout from '../../layout/HeaderLayout';
+import AuthPhotoUpdate from '../../components/common/auth/AuthPhotoUpdate';
 import MPLinkButton from '../../components/contents/mypage/MPLinkButton';
 import { cameraMiniIcon, heartLineIcon, smileIcon, userBorderIcon } from '../../assets/icons/icons';
 
@@ -16,12 +16,11 @@ function MyPage() {
   const currentUser = auth.currentUser;
   const { user } = useUserStore();
   const [isEmailUser, setIsEmailUser] = useState(false);
+  const profilePhotoRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (currentUser?.providerData.some(provider => provider.providerId === 'password')) setIsEmailUser(true);
   }, [currentUser]);
-
-  const editUserImg = () => {};
 
   return (
     <HeaderLayout back>
@@ -35,18 +34,18 @@ function MyPage() {
                 alt='User profile'
                 className='w-full h-full object-cover rounded-full overflow-hidden'
               />
-              <button
+              <AuthPhotoUpdate
+                photoRef={profilePhotoRef}
                 className='absolute bottom-0 right-0 w-5 h-5
-              flex justify-center items-center
-              rounded-full bg-white shadow-[0_0_2.67px_0_#00000040]'
-                onClick={editUserImg}
+                  flex justify-center items-center
+                  rounded-full bg-white shadow-[0_0_2.67px_0_#00000040]'
               >
                 <img
                   src={cameraMiniIcon}
                   alt='Edit user image'
                   className='w-[14px] h-[14px]'
                 />
-              </button>
+              </AuthPhotoUpdate>
             </div>
 
             <div className='mt-[17px] flex flex-col items-center gap-2 mb-[20px]'>

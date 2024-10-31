@@ -8,7 +8,7 @@ export const getChat = async (chatId: string) => {
       return {
         chatId: chatId,
         title: chatDoc.data().title,
-        datetime: chatDoc.data().datetime
+        datetime: chatDoc.data().datetime.toDate()
       };
     } else {
       console.log("해당 문서가 없습니다.");

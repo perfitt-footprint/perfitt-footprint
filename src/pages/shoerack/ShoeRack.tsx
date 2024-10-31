@@ -1,15 +1,13 @@
 // 신발장 메인 페이지
 
-// 뒤로가기
-// 로그인 안 했을 때 로그인 link
-// 프로필 사진 변경
 // 무한 스크롤?
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAuthStore } from '../../stores/auth.store';
 import { useUserStore } from '../../stores/user.store';
 import { useShoeRackStore } from '../../stores/shoerack.store';
 import HeaderLayout from '../../layout/HeaderLayout';
+import AuthPhotoUpdate from '../../components/common/auth/AuthPhotoUpdate';
 import SREmpty from '../../components/contents/shoerack/SREmpty';
 import SRShoeRack from '../../components/contents/shoerack/SRShoeRack';
 import { plusCircleIcon, userIcon } from '../../assets/icons/icons';
@@ -18,12 +16,11 @@ function ShoeRack() {
   const { uid, isLoading } = useAuthStore();
   const { user } = useUserStore();
   const { shoeRack, fetchShoeRack } = useShoeRackStore();
+  const profilePhotoRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (!isLoading) fetchShoeRack(uid);
   }, [isLoading, user]);
-
-  const editUserImg = () => {};
 
   return (
     <HeaderLayout
@@ -39,15 +36,15 @@ function ShoeRack() {
               alt='User profile picture'
               className='w-full h-full object-cover rounded-full'
             />
-            <button
+            <AuthPhotoUpdate
+              photoRef={profilePhotoRef}
               className='absolute bottom-0 right-0 w-[16px] h-[16px]'
-              onClick={editUserImg}
             >
               <img
                 src={plusCircleIcon}
                 alt='Edit user image'
               />
-            </button>
+            </AuthPhotoUpdate>
           </div>
           <div className='flex flex-col gap-1'>
             <h3 className='text-[16px] font-semibold leading-5'>{user?.name}</h3>

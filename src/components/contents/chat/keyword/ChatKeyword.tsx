@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { TChatMessage } from '../../../../types/db';
 import { getKeywords } from '../../../../api/perfitt/getKeywords';
 import { postChatCompletionsKeywords } from '../../../../api/perfitt/postChatCompletionsKeywords';
 import { createChat } from '../../../../api/firebase/createChat';
-import { upsertUserChat } from '../../../../api/firebase/upsertUserChat';
 import Button from '../../../common/Button';
 import Header from '../../../common/Header';
 import { checkIcon } from '../../../../assets/icons/icons';
 
-const ChatKeyword = ({ uid, keywordMessage }: { uid: string; keywordMessage: TChatMessage }) => {
-  const navigate = useNavigate();
+type TChatKeywordProps = {
+  keywordMessage: TChatMessage;
+  sendNewChatMessage: (chatId: string, messages: TChatMessage[]) => Promise<void>;
+};
+
+const ChatKeyword = ({ keywordMessage, sendNewChatMessage }: TChatKeywordProps) => {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -33,30 +35,31 @@ const ChatKeyword = ({ uid, keywordMessage }: { uid: string; keywordMessage: TCh
   // 선택 완료
   const handleBtnClick = async () => {
     if (selected.length > 0) {
-      const data = await postChatCompletionsKeywords(selected);
-      if (data) {
-        const messages = [
-          { ...keywordMessage, id: 0 },
-          {
-            id: 1,
-            sender: 'user',
-            text: selected.join(', '),
-          },
-          {
-            ...data,
-            ...(data.products ? { products: data.products.slice(0, 5) } : {}),
-            ...(data.brands ? { brands: data.brands.slice(0, 7) } : {}),
-            text: data.message,
-            id: 2,
-            sender: 'AI',
-          },
-        ];
-        const title = '관심 키워드';
-        const chatId = await createChat(messages, title);
-        if (chatId) {
-          const res = await upsertUserChat(uid, chatId);
-          if (res === 'success') navigate(`/chat?id=${chatId}`);
+      try {
+        const data = await postChatCompletionsKeywords(selected);
+        if (data) {
+          const messages = [
+            { ...keywordMessage, id: 0 },
+            {
+              id: 1,
+              sender: 'user',
+              text: selected.join(', '),
+            },
+            {
+              ...data,
+              ...(data.products ? { products: data.products.slice(0, 5) } : {}),
+              ...(data.brands ? { brands: data.brands.slice(0, 7) } : {}),
+              text: data.message,
+              id: 2,
+              sender: 'AI',
+            },
+          ];
+
+          const chatId = await createChat('관심 키워드');
+          if (chatId) await sendNewChatMessage(chatId, messages);
         }
+      } catch (error) {
+        console.log(error);
       }
     }
   };

@@ -10,6 +10,7 @@ import { reauthenticateWithCredential, reauthenticateWithPopup } from 'firebase/
 import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth/web-extension';
 import { auth } from '../../service/firebase';
 import { deleteUser } from '../../api/firebase/deleteUser';
+import { deleteUserProfileStorage } from '../../api/firebase/deleteUserProfileStorage';
 import InfoMessage from '../../components/common/InfoMessage';
 import AuthContainer from '../../components/common/auth/AuthContainer';
 import AuthInput from '../../components/common/auth/AuthInput';
@@ -89,10 +90,13 @@ function ASDelete() {
 
       // 탈퇴
       await user.delete();
-      const res = await deleteUser(user.uid);
-      if (res) {
-        alert('탈퇴되었습니다.');
-        navigate('/chat?mode=sign');
+      const res1 = await deleteUserProfileStorage(user.uid);
+      if (res1) {
+        const res2 = await deleteUser(user.uid);
+        if (res2) {
+          alert('탈퇴되었습니다.');
+          navigate('/chat?mode=sign');
+        }
       }
     } catch (error) {
       alert('탈퇴 실패');

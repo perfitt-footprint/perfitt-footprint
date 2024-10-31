@@ -58,7 +58,7 @@ export type TChatMessage = {
   id?: number | string;
   sender?: string;
   text?: string;
-  image?: string;
+  image?: string | File;
   products?: TProduct[];
   brands?: TBrand[];
   dislike?: boolean;
@@ -68,7 +68,7 @@ export type TChat = {
   chatId: string;
   title?: string;
   messages?: TChatMessage[];
-  datetime?: Date | firebase.firestore.Timestamp;
+  datetime?: Date;
 }
 
 export type TSharedChat = {

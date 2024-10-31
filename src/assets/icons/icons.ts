@@ -5,7 +5,6 @@ import chatIcon from './chat-icon.svg';
 import checkIcon from './check-icon.svg';
 import copyIcon from './copy-icon.svg';
 import exportIcon from './export-icon.svg';
-import exportWhiteIcon from './export-white-icon.svg';
 import footprintIcon from './footprint-icon.svg';
 import galleryIcon from './gallery-Icon.svg';
 import heartFilledIcon from './heart-filled-icon.svg';
@@ -32,7 +31,6 @@ import starIcon from './star-icon.svg';
 import thumbsDownIcon from './thumbs-down-icon.svg';
 import trashIcon from './trash-icon.svg';
 import trashRedIcon from './trash-red-icon.svg';
-import trashWhiteIcon from './trash-white-icon.svg';
 import upArrowIcon from './up-arrow-icon.svg';
 import userBorderIcon from './user-border-icon.svg';
 import userIcon from './user-icon.svg';
@@ -47,7 +45,6 @@ export {
   checkIcon,
   copyIcon,
   exportIcon,
-  exportWhiteIcon,
   footprintIcon,
   galleryIcon,
   heartFilledIcon,
@@ -74,7 +71,6 @@ export {
   thumbsDownIcon,
   trashIcon,
   trashRedIcon,
-  trashWhiteIcon,
   upArrowIcon,
   userBorderIcon,
   userIcon,

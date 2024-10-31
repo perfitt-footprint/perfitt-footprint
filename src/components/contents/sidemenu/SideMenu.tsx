@@ -1,12 +1,5 @@
 // 사이드 메뉴
 
-// 리스트 날짜별 분류
-// 데이터 가져올 때 지난 7일까지만 가져오기
-// 로그안 안되어있을 때 로그인 페이지 link
-// 채팅 리스트 드래그 / 공유하기, 삭제하기
-// 로그아웃
-// 로그인/회원가입 링크 변경
-
 import { useEffect, useState } from 'react';
 import { auth } from '../../../service/firebase';
 import { TChat } from '../../../types/db';
@@ -14,6 +7,7 @@ import { useAuthStore } from '../../../stores/auth.store';
 import { useUserStore } from '../../../stores/user.store';
 import { getUserChat } from '../../../api/firebase/getUserChat';
 import { getChat } from '../../../api/firebase/getChat';
+import { deleteUserChat } from '../../../api/firebase/deleteUserChat';
 import SMChatList from './SMChatList';
 import { menuIcon, plusIcon, userIcon } from '../../../assets/icons/icons';
 
@@ -22,10 +16,16 @@ type TSideMenuProps = {
   toggleMenu: () => void;
 };
 
+type TChatData = {
+  id: string;
+  dateCategory: string;
+  chatList: TChat[];
+};
+
 const SideMenu = ({ isMenuOpen, toggleMenu }: TSideMenuProps) => {
   const { uid, isLoading } = useAuthStore();
   const { user, fetchUserInfo } = useUserStore();
-  const [chatData, setChatData] = useState<TChat[]>();
+  const [chatData, setChatData] = useState<TChatData[]>();
 
   useEffect(() => {
     if (!isLoading && uid) {
@@ -43,7 +43,70 @@ const SideMenu = ({ isMenuOpen, toggleMenu }: TSideMenuProps) => {
           return await getChat(chatId);
         })
       );
-      setChatData(chatList);
+      groupChatByDate(chatList);
+    }
+  };
+
+  // 날짜별 채팅 분류
+  const groupChatByDate = (chatList: TChat[]) => {
+    const sortedChatList = chatList.sort((a, b) => b.datetime!.getTime() - a.datetime!.getTime());
+
+    const today = new Date(new Date().toDateString());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7);
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+
+    const categorizedChats = [
+      {
+        id: 'today',
+        dateCategory: '오늘',
+        chatList: sortedChatList.filter(chat => chat.datetime! >= today),
+      },
+      {
+        id: 'yesterday',
+        dateCategory: '어제',
+        chatList: sortedChatList.filter(chat => chat.datetime! < today && chat.datetime! >= yesterday),
+      },
+      {
+        id: 'last7days',
+        dateCategory: '지난 7일',
+        chatList: sortedChatList.filter(chat => chat.datetime! < yesterday && chat.datetime! >= sevenDaysAgo),
+      },
+      {
+        id: 'last30days',
+        dateCategory: '지난 30일',
+        chatList: sortedChatList.filter(chat => chat.datetime! < sevenDaysAgo && chat.datetime! >= thirtyDaysAgo),
+      },
+    ];
+
+    setChatData(categorizedChats);
+  };
+
+  // 채팅 삭제
+  const deleteChat = async (dateCategory: string, chatId: string) => {
+    const confirmDelete = window.confirm('채팅을 삭제하시겠습니까?');
+    if (confirmDelete) {
+      try {
+        await deleteUserChat(uid, chatId);
+        setChatData(prevChatData =>
+          prevChatData?.map(chatGroup => {
+            if (chatGroup.dateCategory === dateCategory) {
+              return {
+                ...chatGroup,
+                chatList: chatGroup.chatList.filter(chat => chat.chatId !== chatId),
+              };
+            }
+            return chatGroup;
+          })
+        );
+        alert('삭제되었습니다.');
+      } catch (error) {
+        alert('채팅 삭제 실패');
+        console.log('채팅 삭제 실패: ', error);
+      }
     }
   };
 
@@ -95,12 +158,17 @@ const SideMenu = ({ isMenuOpen, toggleMenu }: TSideMenuProps) => {
 
         {/* 채팅 리스트 */}
         <div className='flex-1 overflow-scroll scrollbar-hide'>
-          {chatData !== undefined && chatData.length > 0 && (
-            <SMChatList
-              date={'오늘'}
-              chatlist={chatData}
-              handleLink={handleLink}
-            />
+          {chatData?.map(
+            chatGroup =>
+              chatGroup.chatList.length > 0 && (
+                <SMChatList
+                  key={chatGroup.id}
+                  dateCategory={chatGroup.dateCategory}
+                  chatList={chatGroup.chatList}
+                  handleLink={handleLink}
+                  handleDelete={deleteChat}
+                />
+              )
           )}
         </div>
 

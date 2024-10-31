@@ -49,6 +49,7 @@ const SignCard = () => {
         signUp();
       }
     } catch (error) {
+      await signOut(auth);
       console.error('구글 인증 실패: ', error);
     }
   };

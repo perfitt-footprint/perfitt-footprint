@@ -1,28 +1,27 @@
 import { TChat } from '../../../types/db';
 import { useShareStore } from '../../../stores/share.store';
-import { chatIcon, exportWhiteIcon, trashWhiteIcon } from '../../../assets/icons/icons';
+import { chatIcon, exportIcon, trashRedIcon } from '../../../assets/icons/icons';
 
 type TSMChatListProps = {
-  date: string;
-  chatlist: TChat[];
+  dateCategory: string;
+  chatList: TChat[];
   handleLink: (link: string) => void;
+  handleDelete: (dateCategory: string, chatId: string) => Promise<void>;
 };
 
-function SMChatList({ date, chatlist, handleLink }: TSMChatListProps) {
+function SMChatList({ dateCategory, chatList, handleLink, handleDelete }: TSMChatListProps) {
   const { setShareOpen } = useShareStore();
 
-  const deleteChat = () => {};
-
   return (
-    <div className='mt-[15px]'>
-      <div className='mb-2 text-[14px] leading-6 font-semibold text-[#A1A1AA]'>{date}</div>
-      {chatlist.map(chat => (
+    <div className='my-4 flex flex-col gap-1'>
+      <div className='text-[14px] leading-6 font-semibold text-[#A1A1AA]'>{dateCategory}</div>
+      {chatList.map(chat => (
         <div
           key={chat.chatId}
-          className='relative w-full h-[34px] flex overflow-hidden'
+          className='relative w-full h-[34px]'
         >
           <button
-            className='h-[34px] flex items-center gap-2'
+            className='w-full h-full pr-[66px] flex items-center gap-2'
             onClick={() => handleLink(`/chat?id=${chat.chatId}`)}
           >
             <img
@@ -30,37 +29,34 @@ function SMChatList({ date, chatlist, handleLink }: TSMChatListProps) {
               alt='Chat'
               className='w-5 h-5'
             />
-            <div className='text-base whitespace-nowrap'>{chat.title}</div>
+            <div className='flex-1 pr-2.5 text-left whitespace-nowrap overflow-scroll'>{chat.title}</div>
           </button>
 
           {/* 공유 & 삭제 */}
-          <div className='ml-2.5 h-full flex'>
-            <button
-              className='w-[45px] h-full bg-[#A1A1AA] hover:opacity-90'
-              onClick={() => setShareOpen(chat.chatId, chat.title)}
-            >
-              <img
-                src={exportWhiteIcon}
-                alt='Share chat'
-                className='m-auto'
-              />
-            </button>
-            <button
-              className='w-[45px] h-full bg-[#F87171] hover:opacity-90'
-              onClick={deleteChat}
-            >
-              <img
-                src={trashWhiteIcon}
-                alt='Delete chat'
-                className='m-auto'
-              />
-            </button>
-          </div>
-
-          <div className='absolute w-full h-full flex justify-between pointer-events-none'>
-            <div className='w-[18px] h-full' />
-            {/* <div className='w-[18px] h-full bg-gradient-to-r from-white to-transparent' /> */}
+          <div className='absolute top-0 right-0 h-full flex gap-2.5'>
             <div className='w-[18px] h-full bg-gradient-to-r from-transparent to-white' />
+            <div className='h-full flex opacity-80'>
+              <button
+                className='w-7 h-full hover:opacity-100'
+                onClick={() => setShareOpen(chat.chatId, chat.title)}
+              >
+                <img
+                  src={exportIcon}
+                  alt='Share chat'
+                  className='size-5 m-auto'
+                />
+              </button>
+              <button
+                className='w-7 h-full hover:opacity-100'
+                onClick={() => handleDelete(dateCategory, chat.chatId)}
+              >
+                <img
+                  src={trashRedIcon}
+                  alt='Delete chat'
+                  className='size-5 m-auto opacity-80'
+                />
+              </button>
+            </div>
           </div>
         </div>
       ))}

@@ -1,5 +1,6 @@
 // 회원가입
 
+// select css
 // 구글 팝업 에러
 // 이메일 중복 검사
 // 공백 제거
@@ -63,6 +64,8 @@ function SignUp() {
         navigate('/chat?mode=keyword');
       } else throw new Error('Failed Sign Up');
     } catch (error) {
+      const user = auth.currentUser;
+      await user?.delete();
       throw error;
     }
   };

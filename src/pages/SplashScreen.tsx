@@ -1,19 +1,32 @@
 // Splash Screen
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getHello } from '../api/perfitt/getHello';
 import { footprintIcon } from '../assets/icons/icons';
 import { perfittLogo } from '../assets/images/images';
 
 function SplashScreen() {
   const navigate = useNavigate();
+  const [checkAPI, setCheckAPI] = useState(false);
+
+  const helloAPI = async () => {
+    try {
+      const res = await getHello();
+      if (res === 'success') setCheckAPI(true);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
+    helloAPI();
     const timer = setTimeout(() => {
-      navigate('/onboarding');
+      if (checkAPI) navigate('/onboarding');
+      else window.location.reload();
     }, 6000);
     return () => clearTimeout(timer);
-  }, []);
+  }, [checkAPI]);
 
   return (
     <div className='relative w-full h-full flex justify-center items-center bg-black'>

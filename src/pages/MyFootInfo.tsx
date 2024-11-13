@@ -11,7 +11,7 @@ function MyFootInfo() {
     if (win.initializePerfittSize) {
       win.initializePerfittSize();
     } else {
-      console.error('에러..에러어어어어ㅓ~');
+      console.error('error');
     }
   }, []);
   return (

@@ -1,17 +1,19 @@
 // 내 발 정보 페이지
 
-// 내 발 측정 SDK 연동
-
-import { useEffect } from 'react';
 import HeaderLayout from '../layout/HeaderLayout';
 import Button from '../components/common/Button';
 import { footLoading } from '../assets/images/images';
+import { useEffect } from 'react';
 
 function MyFootInfo() {
   useEffect(() => {
-    (window as any).initializePerfittSize();
+    const win = window as any;
+    if (win.initializePerfittSize) {
+      win.initializePerfittSize();
+    } else {
+      console.error('에러..에러어어어어ㅓ~');
+    }
   }, []);
-
   return (
     <HeaderLayout
       title='내 발 정보'
@@ -29,7 +31,7 @@ function MyFootInfo() {
             <div className='mt-[8px] text-[#808080] leading-[22px]'>발 촬영으로 내 발 리포트를 받아보세요.</div>
           </div>
         </div>
-        <Button>내 발 측정하기</Button>
+        <Button id='perfitt_size_button'>내 발 측정하기</Button>
       </div>
     </HeaderLayout>
   );

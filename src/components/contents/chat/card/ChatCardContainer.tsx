@@ -4,6 +4,7 @@ import { useShareStore } from '../../../../stores/share.store';
 import ChatProductCard from './ChatProductCard';
 import ChatBrandCard from './ChatBrandCard';
 import { exportIcon, thumbsDownIcon, upArrowIcon } from '../../../../assets/icons/icons';
+import { useEffect, useRef } from 'react';
 
 const ChatCardContainer = ({ products, brands }: TChatMessage) => {
   const isChat = window.location.pathname.startsWith('/chat');
@@ -14,10 +15,33 @@ const ChatCardContainer = ({ products, brands }: TChatMessage) => {
 
   const handlePLP = () => {};
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (scrollContainerRef.current) {
+        event.preventDefault();
+        scrollContainerRef.current.scrollLeft += event.deltaY;
+      }
+    };
+    const scrollContainer = scrollContainerRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener('wheel', handleWheel, { passive: false });
+    }
+    return () => {
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('wheel', handleWheel);
+      }
+    };
+  }, []);
+
   return (
     <div className='flex flex-col gap-[9px] mt-2.5'>
       {products && (
-        <div className={`flex gap-2.5 pl-11 overflow-x-scroll scrollbar-hide ${!isChat && 'pr-11'}`}>
+        <div
+          ref={scrollContainerRef}
+          className={`flex gap-2.5 pl-11 overflow-x-scroll scrollbar-hide ${!isChat && 'pr-11'}`}
+        >
           {products?.slice(0, 5).map((product, index) => (
             <ChatProductCard
               key={index}
@@ -43,7 +67,10 @@ const ChatCardContainer = ({ products, brands }: TChatMessage) => {
       )}
 
       {brands && (
-        <div className='flex gap-2.5 px-11 overflow-x-scroll scrollbar-hide'>
+        <div
+          ref={scrollContainerRef}
+          className='flex gap-2.5 px-11 overflow-x-scroll scrollbar-hide'
+        >
           {brands?.map((brand, index) => (
             <ChatBrandCard
               key={index}

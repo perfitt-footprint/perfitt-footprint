@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TChatMessage } from '../../../../types/db';
 import { getQuestionRecommend } from '../../../../api/perfitt/getQuestionRecommend';
 
@@ -32,10 +32,22 @@ const ChatQuestions = ({ sendMessage }: TChatQuestionsProps) => {
       </>
     );
   };
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleWheel = (event: React.WheelEvent) => {
+    event.preventDefault();
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft += event.deltaY;
+    }
+  };
 
   return (
     questions && (
-      <div className='py-2.5 px-4 flex gap-2 overflow-x-auto scrollbar-hide'>
+      <div
+        ref={scrollContainerRef}
+        onWheel={handleWheel}
+        className='py-2.5 px-4 flex gap-2 overflow-x-auto scrollbar-hide'
+      >
         {questions.map((q, index) => (
           <button
             key={index}
